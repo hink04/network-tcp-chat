@@ -29,11 +29,44 @@ int main()
     serverAddr.sin_port=htons(8080);//포트 설정
     serverAddr.sin_addr.s_addr=INADDR_ANY;//서버의 모든ip에서 연결허용
     
-    if(bind(serverSocket,(sockaddr*)&serverAddr,sizeof(serverAddr))){
-        cout<< "bind conected\n"; 
+    if(bind(serverSocket,(sockaddr*)&serverAddr,sizeof(serverAddr))==SOCKET_ERROR){//서버의 주소부여(bind)
+        cout<< "bind failed\n"; 
     }
-    else cout<< "bind failed\n ";
+    else cout<< "bind conected\n";
 
+    if(listen(serverSocket,SOMAXCONN)==SOCKET_ERROR){//서버연결요청 대기상태(listen)
+        cout<< "listen failed\n";
+    }
+    else cout<< "listen created\n";
+
+    sockaddr_in clientAddr{};//서버에 대기하는 클라이언트 구조체 설정
+    int clientSize=sizeof(clientAddr);
+
+    SOCKET clientSocket = accept(serverSocket,(sockaddr*)&clientAddr,&clientSize);//서버 연결(accept) 단, 반복문을 쓰지않아서 1명만 가능
+
+    if(clientSocket==INVALID_SOCKET){
+        cout<< "accept failed\n";
+    }
+    else cout<< "accept conneted\n";
+
+    char buffer[1024];//클라이언트에게 받은 메세지 저장
+
+    int received = recv(clientSocket,buffer,sizeof(buffer),0);//반환값이 바이트크기
+
+    if(received>0){//tcp는 메세지가 아니라 바이트로 받는것을 기억하자.
+        buffer[received]='\0'; //받은 문자열 종료 표시
+        cout<<"received message : "<<buffer<<"\n";
+
+        int sent=send(clientSocket,buffer,received,0);//메세지 보내기
+        if(sent==SOCKET_ERROR){
+            cout<<"send failed\n";
+        }
+        else cout<<"send successed\n";
+    }
+    else if(received==0) cout<<"client disconnected\n";//received가 0이면 없음
+    else cout<<"recv failed\n";
+
+    closesocket(clientSocket);
     closesocket(serverSocket);
     WSACleanup();
 
