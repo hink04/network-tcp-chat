@@ -51,7 +51,7 @@ int main()
 
     char buffer[1024];//클라이언트에게 받은 메세지 저장
 
-    int received = recv(clientSocket,buffer,sizeof(buffer),0);//반환값이 바이트크기
+    int received = recv(clientSocket,buffer,sizeof(buffer),0);//메세지 받기(반환값이 바이트크기)
 
     if(received>0){//tcp는 메세지가 아니라 바이트로 받는것을 기억하자.
         buffer[received]='\0'; //받은 문자열 종료 표시
