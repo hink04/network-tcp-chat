@@ -23,6 +23,18 @@ int main()
     if(serverSocket==INVALID_SOCKET) cout<< "Socket failed" << "\n";
     else cout<< "Socket created" << "\n";
 
+    sockaddr_in serverAddr{};//구조체 만들고 0으로 초기화
+
+    serverAddr.sin_family = AF_INET;//ipv4설정
+    serverAddr.sin_port=htons(8080);//포트 설정
+    serverAddr.sin_addr.s_addr=INADDR_ANY;//서버의 모든ip에서 연결허용
+    
+    if(bind(serverSocket,(sockaddr*)&serverAddr,sizeof(serverAddr))){
+        cout<< "bind conected\n"; 
+    }
+    else cout<< "bind failed\n ";
+
+    closesocket(serverSocket);
     WSACleanup();
 
     return 0;
