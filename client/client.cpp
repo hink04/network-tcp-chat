@@ -35,6 +35,27 @@ int main()
     }
     else cout<<"connect server\n";
 
+    while(1){
+    char msg[1024];
+
+    cout<<"input data : ";
+    cin.getline(msg,sizeof(msg));
+    if(strlen(msg) == 0) //그냥 엔터만 눌렀을때 값을 보내지 않기 위해서 설정함
+        {
+            cout << "empty message can't sent.\n";
+            continue;
+        }
+    int sent=send(clientSocket,msg,strlen(msg),0);//서버한테 msg보내기
+
+    char buffer[1025];
+
+    int received=recv(clientSocket,buffer,sizeof(buffer)-1,0);//서버에게 buffer받기
+    if(received>0){
+        buffer[received]='\0';
+        cout<<"server : "<<buffer<<'\n';
+    }
+    }
+   
     closesocket(clientSocket);
     WSACleanup();
 
