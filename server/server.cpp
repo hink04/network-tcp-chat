@@ -42,16 +42,17 @@ int main()
     sockaddr_in clientAddr{};//서버에 대기하는 클라이언트 구조체 설정
     int clientSize=sizeof(clientAddr);
 
-    SOCKET clientSocket = accept(serverSocket,(sockaddr*)&clientAddr,&clientSize);//서버 연결(accept) 단, 반복문을 쓰지않아서 1명만 가능
+    SOCKET clientSocket = accept(serverSocket,(sockaddr*)&clientAddr,&clientSize);//서버 연결(accept) 
 
     if(clientSocket==INVALID_SOCKET){
         cout<< "accept failed\n";
     }
     else cout<< "accept conneted\n";
 
-    char buffer[1024];//클라이언트에게 받은 메세지 저장
+    while(1){
+    char buffer[1025];//클라이언트에게 받은 메세지 저장
 
-    int received = recv(clientSocket,buffer,sizeof(buffer),0);//메세지 받기(반환값이 바이트크기)
+    int received = recv(clientSocket,buffer,sizeof(buffer)-1,0);//메세지 받기(반환값이 바이트크기)
 
     if(received>0){//tcp는 메세지가 아니라 바이트로 받는것을 기억하자.
         buffer[received]='\0'; //받은 문자열 종료 표시
@@ -63,8 +64,15 @@ int main()
         }
         else cout<<"send successed\n";
     }
-    else if(received==0) cout<<"client disconnected\n";//received가 0이면 없음
-    else cout<<"recv failed\n";
+    else if(received==0){
+        cout<<"client disconnected\n";
+        break;
+    }//received가 0이면 
+    else {
+        cout<<"recv failed\n"<<WSAGetLastError()<<'\n';
+        break;
+    }
+    }
 
     closesocket(clientSocket);
     closesocket(serverSocket);
